@@ -182,16 +182,13 @@ spring:
     activate:
       on-profile: prod
   
-  # Disable JPA/PostgreSQL for MongoDB-only setup
+  # Disable JPA/PostgreSQL/Redis for minimal setup
   autoconfigure:
     exclude:
       - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
       - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
-  
-  data:
-    mongodb:
-      uri: ${MONGO_ATLAS_URL:mongodb+srv://yappzy_admin:${MONGO_ATLAS_PASSWORD}@cluster0.xxxxx.mongodb.net/yappzy?retryWrites=true&w=majority}
-      database: yappzy
+      - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.mongo.MongoDataAutoConfiguration
 
 # Production server configuration
 server:
@@ -203,6 +200,22 @@ server:
     threads:
       max: 200
       min-spare: 10
+
+# Production management configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: never
+  health:
+    defaults:
+      enabled: false
+    ping:
+      enabled: true
   
 logging:
   level:
