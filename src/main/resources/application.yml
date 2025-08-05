@@ -192,9 +192,21 @@ spring:
     mongodb:
       uri: ${MONGO_ATLAS_URL:mongodb+srv://yappzy_admin:${MONGO_ATLAS_PASSWORD}@cluster0.xxxxx.mongodb.net/yappzy?retryWrites=true&w=majority}
       database: yappzy
+
+# Production server configuration
+server:
+  port: ${PORT:10000}
+  address: 0.0.0.0
+  servlet:
+    context-path: /api/v1
+  tomcat:
+    threads:
+      max: 200
+      min-spare: 10
   
 logging:
   level:
     com.yappzy: INFO
     org.springframework.security: WARN
     org.hibernate.SQL: WARN
+    root: INFO

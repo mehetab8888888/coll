@@ -10,10 +10,22 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/health")
 public class HealthController {
 
-    @GetMapping
+    // Root endpoint for Render health checks
+    @GetMapping("/")
+    public ResponseEntity<Map<String, Object>> root() {
+        Map<String, Object> response = new HashMap<>();
+        response.put("status", "UP");
+        response.put("service", "Yappzy Backend API");
+        response.put("version", "1.0.0");
+        response.put("timestamp", LocalDateTime.now());
+        response.put("message", "Welcome to Yappzy Backend!");
+        
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/health")
     public ResponseEntity<Map<String, Object>> health() {
         Map<String, Object> response = new HashMap<>();
         response.put("status", "UP");
