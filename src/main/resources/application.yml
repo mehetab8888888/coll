@@ -182,13 +182,16 @@ spring:
     activate:
       on-profile: prod
   
+  # Disable JPA/PostgreSQL for MongoDB-only setup
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+  
   data:
     mongodb:
       uri: ${MONGO_ATLAS_URL:mongodb+srv://yappzy_admin:${MONGO_ATLAS_PASSWORD}@cluster0.xxxxx.mongodb.net/yappzy?retryWrites=true&w=majority}
       database: yappzy
-  
-  jpa:
-    show-sql: false
   
 logging:
   level:
