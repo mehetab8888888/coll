@@ -1,0 +1,192 @@
+server:
+  port: ${PORT:10000}
+  address: 0.0.0.0
+  servlet:
+    context-path: /api/v1
+
+spring:
+  datasource:
+    url: jdbc:postgresql://dpg-d287slripnbc739eoong-a:5432/yappzy?ssl=true&sslmode=require
+    username: admin
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+  
+  data:
+    mongodb:
+      uri: ${MONGO_URL:mongodb://yappzy_admin:yappzy_secure_mongo_2024!@localhost:27017/yappzy}
+      database: yappzy
+    
+    redis:
+      url: ${REDIS_URL:redis://localhost:6379}
+      timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+  
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${JWT_ISSUER_URI:http://localhost:4444}
+  
+  cache:
+    type: redis
+    redis:
+      time-to-live: 3600000
+  
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+
+# Management and Monitoring
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics,prometheus,info
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
+# gRPC Configuration
+grpc:
+  server:
+    port: 9090
+  client:
+    yappzy-service:
+      address: 'static://localhost:9090'
+      enableKeepAlive: true
+      keepAliveWithoutCalls: true
+
+# Logging
+logging:
+  level:
+    com.yappzy: DEBUG
+    org.springframework.security: DEBUG
+    org.springframework.web: INFO
+    org.hibernate.SQL: DEBUG
+  pattern:
+    console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{ISO8601} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: logs/yappzy-backend.log
+
+# Custom Application Properties
+yappzy:
+  jwt:
+    secret: ${JWT_SECRET:your-super-secret-jwt-key-here-make-it-long-and-secure}
+    expiration: 86400000 # 24 hours
+  
+  cors:
+    allowed-origins: 
+      - https://yappzy.online
+      - https://www.yappzy.online
+      - https://api.yappzy.online
+      - http://localhost:3000
+      - https://yappzy-backend.onrender.com
+      - https://yappzy-frontend.onrender.com # Placeholder for your web app
+      - https://coll-svdv.onrender.com
+    allowed-methods: GET,POST,PUT,DELETE,OPTIONS
+    allowed-headers: "*"
+    allow-credentials: true
+  
+  file-upload:
+    max-size: 50MB
+    allowed-types: 
+      - image/jpeg
+      - image/png
+      - image/gif
+      - video/mp4
+      - video/mpeg
+      - application/pdf
+  
+  backup:
+    enabled: true
+    schedule: "0 0 2 * * ?" # Daily at 2 AM
+    cloud-providers:
+      google-drive:
+        enabled: true
+        storage-limit: 15GB
+      mega:
+        enabled: true
+        storage-limit: 20GB
+      firebase:
+        enabled: true
+        project-id: ${FIREBASE_PROJECT_ID:yappzy-backend}
+      proton-drive:
+        enabled: true
+        storage-limit: 1GB
+      pcloud:
+        enabled: true
+        storage-limit: 10GB
+      tresorit:
+        enabled: true
+        storage-limit: 3GB
+      sync-com:
+        enabled: true
+        storage-limit: 5GB
+      jio-cloud:
+        enabled: true
+        storage-limit: 5GB
+      ice-drive:
+        enabled: true
+        storage-limit: 10GB
+
+# MQTT Configuration
+mqtt:
+  broker:
+    url: ${MQTT_BROKER_URL:tcp://localhost:1883}
+    username: ${MQTT_USERNAME:}
+    password: ${MQTT_PASSWORD:}
+    client-id: yappzy-backend-${random.uuid}
+  topics:
+    user-events: yappzy/users/events
+    chat-messages: yappzy/chat/messages
+    notifications: yappzy/notifications
+
+---
+# Docker Profile
+spring:
+  config:
+    activate:
+      on-profile: docker
+  
+  datasource:
+    url: jdbc:postgresql://postgresql:5432/yappzy
+  
+  data:
+    mongodb:
+      uri: mongodb://yappzy_admin:${MONGO_PASSWORD}@mongodb:27017/yappzy
+    redis:
+      url: redis://:${REDIS_PASSWORD}@redis:6379
+
+mqtt:
+  broker:
+    url: tcp://mosquitto:1883
+
+---
+# Production Profile
+spring:
+  config:
+    activate:
+      on-profile: prod
+  
+  jpa:
+    show-sql: false
+  
+logging:
+  level:
+    com.yappzy: INFO
+    org.springframework.security: WARN
+    org.hibernate.SQL: WARN
