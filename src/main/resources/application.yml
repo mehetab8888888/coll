@@ -176,11 +176,16 @@ mqtt:
     url: tcp://mosquitto:1883
 
 ---
-# Production Profile
+# Production Profile with MongoDB Atlas
 spring:
   config:
     activate:
       on-profile: prod
+  
+  data:
+    mongodb:
+      uri: ${MONGO_ATLAS_URL:mongodb+srv://yappzy_admin:${MONGO_ATLAS_PASSWORD}@cluster0.xxxxx.mongodb.net/yappzy?retryWrites=true&w=majority}
+      database: yappzy
   
   jpa:
     show-sql: false
